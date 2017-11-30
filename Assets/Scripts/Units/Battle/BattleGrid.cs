@@ -21,8 +21,26 @@ public class BattleGrid : MonoBehaviour
     /// The camera movement speed.
     /// </summary>
     [SerializeField]
-    private float _cameraSpeed = 0.2f;
+    private float _cameraMovementSpeed = 0.2f;
 
+    /// <summary>
+    /// The camera rotation speed.
+    /// </summary>
+    [SerializeField]
+    private float _cameraRotationSpeed = 1f;
+
+    /// <summary>
+    /// The camera movement speed multiplier when shift is held.
+    /// </summary>
+    [SerializeField]
+    private float _shiftCameraMovementSpeedMultiplier = 2f;
+
+    /// <summary>
+    /// The camera rotation speed multiplier when shift is held.
+    /// </summary>
+    [SerializeField]
+    private float _shiftCameraRotationSpeedMultiplier = 2f;
+    
     /// <summary>
     /// The minimum camera movement limits.
     /// </summary>
@@ -40,6 +58,11 @@ public class BattleGrid : MonoBehaviour
     /* --------------------------------------------------------------------- */
 
     #region Class Members
+
+    /// <summary>
+    /// The distance from the camera pivot point.
+    /// </summary>
+    private float _distanceFromPivot = 0f;
 
     private List<ControllableUnit> _units;
 
@@ -69,7 +92,7 @@ public class BattleGrid : MonoBehaviour
     /// A reference to the battle turn manager.
     /// </summary>
     private TurnManager _turnManager;
-
+    
     #endregion
 
     /* --------------------------------------------------------------------- */
@@ -87,6 +110,9 @@ public class BattleGrid : MonoBehaviour
     /// </summary>
     void Start()
     {
+        this._distanceFromPivot = Vector3.Distance( Vector3.up * Camera.main.transform.position.y, Camera.main.transform.position );
+        Debug.Log( _distanceFromPivot );
+
         this._hexes = new List<BattleHex>();
 
         this._battleMouse = GetComponent<BattleMouse>();
@@ -152,28 +178,64 @@ public class BattleGrid : MonoBehaviour
     void Update()
     {
         Vector3 cameraPosition = Camera.main.transform.position;
+        Quaternion cameraRotation = Quaternion.Euler( 0f, Camera.main.transform.rotation.eulerAngles.y, 0f );
+        Vector3 movementDirection = Vector3.zero;
+        float movementMultiplier = 1f;
+        float rotationMultiplier = 1f;
+        
+        if ( this._battleKeyboard.IsInputActionDown( BattleInputAction.CameraSpeedMultiplier ) )
+        {
+            movementMultiplier = this._shiftCameraMovementSpeedMultiplier;
+            rotationMultiplier = this._shiftCameraRotationSpeedMultiplier;
+        }
 
         if ( this._battleKeyboard.IsInputActionDown( BattleInputAction.MoveCameraUp ) )
         {
-            cameraPosition.z = Mathf.Min( cameraPosition.z + this._cameraSpeed, this._maxCameraLimit.y );
+            movementDirection.z += 1f;
         }
 
         if ( this._battleKeyboard.IsInputActionDown( BattleInputAction.MoveCameraDown ) )
         {
-            cameraPosition.z = Mathf.Max( cameraPosition.z - this._cameraSpeed, this._minCameraLimit.y );
+            movementDirection.z -= 1f;
         }
 
         if ( this._battleKeyboard.IsInputActionDown( BattleInputAction.MoveCameraRight ) )
         {
-            cameraPosition.x = Mathf.Min( cameraPosition.x + this._cameraSpeed, this._maxCameraLimit.x );
+            movementDirection.x += 1f;
         }
 
         if ( this._battleKeyboard.IsInputActionDown( BattleInputAction.MoveCameraLeft ) )
         {
-            cameraPosition.x = Mathf.Max( cameraPosition.x - this._cameraSpeed, this._minCameraLimit.x );
+            movementDirection.x -= 1f;
         }
 
+        movementDirection = cameraRotation * movementDirection;
+        cameraPosition += ( movementDirection * ( this._cameraMovementSpeed * movementMultiplier ) );
+
+        cameraPosition.x = Mathf.Max( Mathf.Min( cameraPosition.x, this._maxCameraLimit.x ), this._minCameraLimit.x );
+        cameraPosition.z = Mathf.Max( Mathf.Min( cameraPosition.z, this._maxCameraLimit.y ), this._minCameraLimit.y );
+
         Camera.main.transform.position = cameraPosition;
+
+        if ( this._battleKeyboard.IsInputActionDown( BattleInputAction.RotateCameraRight ) && this._battleKeyboard.IsInputActionUp( BattleInputAction.RotateCameraLeft ) )
+        {
+            Vector3 forwardRotation = cameraRotation * new Vector3( 0f, 0f, this._distanceFromPivot );
+                
+            Vector3 pivot = cameraPosition + forwardRotation;
+
+            Camera.main.transform.RotateAround( pivot, Vector3.up, -( this._cameraRotationSpeed * rotationMultiplier ) );
+        }
+        else if ( this._battleKeyboard.IsInputActionDown( BattleInputAction.RotateCameraLeft ) && this._battleKeyboard.IsInputActionUp( BattleInputAction.RotateCameraRight ) )
+        {
+            Vector3 forwardRotation = cameraRotation * new Vector3( 0f, 0f, this._distanceFromPivot );
+
+            Vector3 pivot = cameraPosition + forwardRotation;
+
+            Camera.main.transform.RotateAround( pivot, Vector3.up, this._cameraRotationSpeed * rotationMultiplier );
+        }
+
+        
+        //Camera.main.transform.rotation
     }
 
     #endregion

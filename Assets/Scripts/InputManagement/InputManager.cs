@@ -135,7 +135,7 @@ public class InputManager<ActionType> : MonoBehaviour where ActionType : struct,
 
         int count = keyCodes.Length;
 
-        for ( int i = 1 ; i <= count && this._keyStateChecks.Count <= count ; i++ )
+        for ( int i = this._keyStateChecks.Count + 1 ; i <= count && this._keyStateChecks.Count <= count ; i++ )
         {
             this._keyStateChecks.Add( new KeyState[ i ] );
         }

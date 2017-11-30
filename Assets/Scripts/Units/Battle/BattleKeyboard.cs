@@ -25,6 +25,11 @@ public class BattleKeyboard : InputManager<BattleInputAction>
         base.AddKeyMapping( BattleInputAction.MoveCameraRight, KeyCode.D );
         base.AddKeyMapping( BattleInputAction.MoveCameraDown, KeyCode.S );
         base.AddKeyMapping( BattleInputAction.MoveCameraLeft, KeyCode.A );
+
+        base.AddKeyMapping( BattleInputAction.RotateCameraRight, KeyCode.E );
+        base.AddKeyMapping( BattleInputAction.RotateCameraLeft, KeyCode.Q );
+
+        base.AddKeyMapping( BattleInputAction.CameraSpeedMultiplier, KeyCode.LeftShift );
     }
 
     #endregion

@@ -11,6 +11,12 @@ public enum BattleInputAction
 
     MoveCameraDown = 3,
 
-    MoveCameraLeft = 4
+    MoveCameraLeft = 4,
+
+    RotateCameraRight = 5,
+
+    RotateCameraLeft = 6,
+
+    CameraSpeedMultiplier = 7
 
 }
