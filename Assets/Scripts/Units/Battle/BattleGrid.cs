@@ -111,7 +111,6 @@ public class BattleGrid : MonoBehaviour
     void Start()
     {
         this._distanceFromPivot = Vector3.Distance( Vector3.up * Camera.main.transform.position.y, Camera.main.transform.position );
-        Debug.Log( _distanceFromPivot );
 
         this._hexes = new List<BattleHex>();
 

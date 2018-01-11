@@ -30,6 +30,8 @@ public class AIControlledUnit : BattleUnit
     void Start()
     {
         base.IsAIControlled = true;
+
+        Endurance stat = new Endurance( 5f );
     }
 
     // Update is called once per frame
