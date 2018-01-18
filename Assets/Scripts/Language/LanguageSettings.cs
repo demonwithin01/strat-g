@@ -85,6 +85,7 @@ public partial class LanguageSettings : IDisposable
         this._allSettings = new List<ILanguageSettings>();
 
         this.Stats = Create<StatLanguageSettings>();
+        this.Units = Create<UnitLanguageSettings>();
     }
 
     /// <summary>
@@ -117,6 +118,11 @@ public partial class LanguageSettings : IDisposable
     /// Gets the language settings for stats.
     /// </summary>
     public StatLanguageSettings Stats { get; private set; }
+
+    /// <summary>
+    /// Gets the language settings for unitss.
+    /// </summary>
+    public UnitLanguageSettings Units { get; private set; }
 
     #endregion
 

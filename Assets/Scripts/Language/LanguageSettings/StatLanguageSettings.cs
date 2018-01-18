@@ -14,7 +14,7 @@ namespace DEnt.Language
         #region Constructors/Initialisation
 
         /// <summary>
-        /// Creates/Loads all the stat settings.
+        /// Creates/Loads all the stat language settings.
         /// </summary>
         public StatLanguageSettings()
             : base( "Stats" )
