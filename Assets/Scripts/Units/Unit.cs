@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using DEnt.Language;
 using UnityEngine;
 
@@ -77,6 +78,37 @@ public abstract class Unit : MonoBehaviour
         {
             this.Destroyed.Invoke( this );
         }
+    }
+
+    /// <summary>
+    /// Gets all the stats that are considered valid.
+    /// </summary>
+    /// <remarks>
+    /// A stat is considered valid if it is not null.
+    /// </remarks>
+    public List<Stat> ValidStats()
+    {
+        List<Stat> stats = new List<Stat>();
+
+        if ( this.Endurance != null ) stats.Add( this.Endurance );
+        if ( this.Health != null ) stats.Add( this.Health );
+        if ( this.Initiative != null ) stats.Add( this.Initiative );
+        if ( this.Morale != null ) stats.Add( this.Morale );
+        if ( this.Movement != null ) stats.Add( this.Movement );
+        if ( this.MeleeAttack != null ) stats.Add( this.MeleeAttack );
+        if ( this.MeleeDefence != null ) stats.Add( this.MeleeDefence );
+        if ( this.MeleePrecision != null ) stats.Add( this.MeleePrecision );
+        if ( this.MeleeEvasion != null ) stats.Add( this.MeleeEvasion );
+        if ( this.RangedAttack != null ) stats.Add( this.RangedAttack );
+        if ( this.RangedDefence != null ) stats.Add( this.RangedDefence );
+        if ( this.RangedPrecision != null ) stats.Add( this.RangedPrecision );
+        if ( this.RangedEvasion != null ) stats.Add( this.RangedEvasion );
+        if ( this.MagicAttack != null ) stats.Add( this.MagicAttack );
+        if ( this.MagicDefence != null ) stats.Add( this.MagicDefence );
+        if ( this.MagicPrecision != null ) stats.Add( this.MagicPrecision );
+        if ( this.MagicEvasion != null ) stats.Add( this.MagicEvasion );
+
+        return stats;
     }
 
     #endregion

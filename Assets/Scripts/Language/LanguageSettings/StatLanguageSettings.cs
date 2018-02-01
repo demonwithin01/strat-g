@@ -22,20 +22,20 @@ namespace DEnt.Language
             this.Endurance = Create( "Endurance" );
             this.Health = Create( "Health" );
             this.Initiative = Create( "Initiative" );
-            this.MagicAttack = Create( "Magic Attack" );
-            this.MagicDefence = Create( "Magic Defence" );
-            this.MagicEvasion = Create( "Magic Evasion" );
-            this.MagicPrecision = Create( "Magic Precision" );
-            this.MeleeAttack = Create( "Melee Attack" );
-            this.MeleeDefence = Create( "Melee Defence" );
-            this.MeleeEvasion = Create( "Melee Evasion" );
-            this.MeleePrecision = Create( "Melee Precision" );
+            this.MagicAttack = Create( "MagicAttack" );
+            this.MagicDefence = Create( "MagicDefence" );
+            this.MagicEvasion = Create( "MagicEvasion" );
+            this.MagicPrecision = Create( "MagicPrecision" );
+            this.MeleeAttack = Create( "MeleeAttack" );
+            this.MeleeDefence = Create( "MeleeDefence" );
+            this.MeleeEvasion = Create( "MeleeEvasion" );
+            this.MeleePrecision = Create( "MeleePrecision" );
             this.Morale = Create( "Morale" );
             this.Movement = Create( "Movement" );
-            this.RangedAttack = Create( "Ranged Attack" );
-            this.RangedDefence = Create( "Ranged Defence" );
-            this.RangedEvasion = Create( "Ranged Evasion" );
-            this.RangedPrecision = Create( "Ranged Precision" );
+            this.RangedAttack = Create( "RangedAttack" );
+            this.RangedDefence = Create( "RangedDefence" );
+            this.RangedEvasion = Create( "RangedEvasion" );
+            this.RangedPrecision = Create( "RangedPrecision" );
         }
 
         #endregion
