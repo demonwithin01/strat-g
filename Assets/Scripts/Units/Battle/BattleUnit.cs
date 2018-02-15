@@ -314,6 +314,27 @@ public class BattleUnit : MonoBehaviour
         }
     }
 
+    public void ReceiveAttacks( AttackDamage[] attacks )
+    {
+        for ( int i = 0 ; i < attacks.Length ; i++ )
+        {
+            AttackDamage attack = attacks[ i ];
+
+            switch( attack.Type )
+            {
+                case AttackType.Melee:
+                    this.ApplyAttack( attack, null, null );
+                    break;
+                case AttackType.Ranged:
+                    this.ApplyAttack( attack, null, null );
+                    break;
+                case AttackType.Magic:
+                    this.ApplyAttack( attack, null, null );
+                    break;
+            }
+        }
+    }
+
     /// <summary>
     /// Called when the unit starts its turn.
     /// </summary>
@@ -424,12 +445,23 @@ public class BattleUnit : MonoBehaviour
             }
         }
     }
-    
+
     #endregion
 
     /* --------------------------------------------------------------------- */
 
     #region Private Methods
+
+    /// <summary>
+    /// Applies the details of an attack to the unit.
+    /// </summary>
+    /// <param name="attack">The attack information.</param>
+    /// <param name="defenceStat">The stat that governs defence for the attack type.</param>
+    /// <param name="evasionStat">The stat that governs evasion for the attack type.</param>
+    private void ApplyAttack( AttackDamage attack, Stat defenceStat, Stat evasionStat )
+    {
+
+    }
     
     /// <summary>
     /// Ends the current path and moves on to the next unit.

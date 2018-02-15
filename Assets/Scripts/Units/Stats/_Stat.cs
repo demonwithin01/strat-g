@@ -12,7 +12,17 @@ public abstract class Stat
     /// Holds the value of the stat.
     /// </summary>
     private float _value;
-    
+
+    /// <summary>
+    /// Holds the maximum range variance of the stat.
+    /// </summary>
+    private float _maxVariance;
+
+    /// <summary>
+    /// Holds the minimum range variance of the stat.
+    /// </summary>
+    private float _minVariance;
+
     #endregion
 
     /* ---------------------------------------------------------------------------------------------------------- */
@@ -24,6 +34,18 @@ public abstract class Stat
     /// </summary>
     /// <param name="initialValue">The initial value of the stat.</param>
     public Stat( float initialValue )
+        : this( initialValue, 0f, 0f )
+    {
+        this._value = initialValue;
+    }
+
+    /// <summary>
+    /// Creates a new stat instance using the provided initial value.
+    /// </summary>
+    /// <param name="initialValue">The initial value of the stat.</param>
+    /// <param name="maxVariance">The maximum range variance of the stat.</param>
+    /// <param name="minVariance">The minimum range variance of the stat.</param>
+    public Stat( float initialValue, float maxVariance, float minVariance )
     {
         this._value = initialValue;
     }
@@ -46,6 +68,22 @@ public abstract class Stat
         {
             this._value = Mathf.Max( 0f, this._value );
         }
+    }
+
+    /// <summary>
+    /// Gets the next value to use, takes random variance into account.
+    /// </summary>
+    /// <returns>The next value to use with random variance.</returns>
+    public float NextValue()
+    {
+        float totalRange = ( this._maxVariance - this._minVariance );
+
+        if ( totalRange <= 0f )
+        {
+            return this._value;
+        }
+
+        return ( this._value + Random.Range( -this._minVariance, this._maxVariance ) ) ;
     }
 
     /// <summary>
@@ -99,6 +137,50 @@ public abstract class Stat
         get
         {
             return this._value;
+        }
+    }
+
+    /// <summary>
+    /// Gets the maximum range variance of the stat.
+    /// </summary>
+    public float MaxVariance
+    {
+        get
+        {
+            return this._maxVariance;
+        }
+    }
+
+    /// <summary>
+    /// Gets the minimum range variance of the stat.
+    /// </summary>
+    public float MinVariance
+    {
+        get
+        {
+            return this._minVariance;
+        }
+    }
+
+    /// <summary>
+    /// Gets the max possible value of the stat.
+    /// </summary>
+    public float MaxValue
+    {
+        get
+        {
+            return ( this._value + this._maxVariance );
+        }
+    }
+
+    /// <summary>
+    /// Gets the min possible value of the stat.
+    /// </summary>
+    public float MinValue
+    {
+        get
+        {
+            return ( this._value + this._minVariance );
         }
     }
 

@@ -83,6 +83,10 @@ public class UnitPreview : MonoBehaviour
             {
                 CreateStatText( stats[ i ], i );
             }
+
+            RectTransform contentTransform = this._statsPanel.transform.parent.GetComponent<RectTransform>();
+
+            contentTransform.offsetMin = new Vector2( contentTransform.offsetMin.x, - ( ( stats.Count - 1 ) * 30 ) );
         }
         else
         {
