@@ -57,7 +57,11 @@ namespace StrategyGame.Units
         /// </summary>
         internal override void Perform()
         {
-            this._toAttack.ReceiveDamage( base.unit.AttackDamage );
+            AttackDamage[] attacks = new AttackDamage[ 1 ];
+            attacks[ 0 ] = new AttackDamage( base.unit.Unit.MeleeAttack, base.unit.Unit.MeleePrecision );
+
+            this._toAttack.ReceiveAttacks( attacks );
+
             base.FinishAction();
         }
 

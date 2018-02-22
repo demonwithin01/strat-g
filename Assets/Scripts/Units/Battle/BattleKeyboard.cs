@@ -30,6 +30,8 @@ public class BattleKeyboard : InputManager<BattleInputAction>
         base.AddKeyMapping( BattleInputAction.RotateCameraLeft, KeyCode.Q );
 
         base.AddKeyMapping( BattleInputAction.CameraSpeedMultiplier, KeyCode.LeftShift );
+
+        base.AddKeyMapping( BattleInputAction.ShowUnitDetails, KeyCode.BackQuote );
     }
 
     #endregion

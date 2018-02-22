@@ -208,6 +208,13 @@ public class BattleGrid : MonoBehaviour
             movementDirection.x -= 1f;
         }
 
+        if ( this._battleKeyboard.IsInputActionPressed( BattleInputAction.ShowUnitDetails ) )
+        {
+            GameObject unitPreview = GameObject.Find( "Canvas" ).FindObject( "UnitPreview" );
+
+            unitPreview.SetActive( !unitPreview.activeSelf );
+        }
+
         movementDirection = cameraRotation * movementDirection;
         cameraPosition += ( movementDirection * ( this._cameraMovementSpeed * movementMultiplier ) );
 

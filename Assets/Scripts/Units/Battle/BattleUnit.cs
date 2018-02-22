@@ -88,6 +88,11 @@ public class BattleUnit : MonoBehaviour
     private HexDirection _facingDirection;
 
     /// <summary>
+    /// Holds the unit that this battle unit is based off.
+    /// </summary>
+    private Unit _unit;
+
+    /// <summary>
     /// The current tiles that are within walking distance of this unit.
     /// </summary>
     protected List<BattleHex> hexesWithinDistance;
@@ -107,6 +112,8 @@ public class BattleUnit : MonoBehaviour
         _actions = new Queue<UnitAction>();
         _rotation = new Vector3( 270f, 0f, 0f );
         _facingDirection = HexDirection.East;
+
+        this._unit = new Spearman();
     }
 
     #endregion
@@ -297,23 +304,7 @@ public class BattleUnit : MonoBehaviour
             this._currentAction = this._actions.Dequeue();
         }
     }
-
-    /// <summary>
-    /// Recieves a set amount of damage.
-    /// </summary>
-    /// <param name="damage">The damage taken</param>
-    public void ReceiveDamage( float damage )
-    {
-        Debug.Log( "Taken " + damage + " points of damage" );
-
-        _health -= damage;
-        
-        if ( _health < 1 )
-        {
-            UnitDestroyed();
-        }
-    }
-
+    
     public void ReceiveAttacks( AttackDamage[] attacks )
     {
         for ( int i = 0 ; i < attacks.Length ; i++ )
@@ -460,7 +451,24 @@ public class BattleUnit : MonoBehaviour
     /// <param name="evasionStat">The stat that governs evasion for the attack type.</param>
     private void ApplyAttack( AttackDamage attack, Stat defenceStat, Stat evasionStat )
     {
+        float defence = defenceStat != null ? defenceStat.NextValue() : 0f;
+        float evasion = evasionStat != null ? evasionStat.NextValue() : 0f;
+        float damage = attack.Damage - defence;
 
+        if ( attack.Precision < evasion )
+        {
+            Debug.Log( "Attack Evaded" );
+            return;
+        }
+
+        _health -= damage;
+
+        Debug.Log( "Took " + damage + " points of damage. Health left: " + _health );
+
+        if ( _health < 1 )
+        {
+            UnitDestroyed();
+        }
     }
     
     /// <summary>
@@ -509,6 +517,11 @@ public class BattleUnit : MonoBehaviour
     /// Gets the attack damage of this unit.
     /// </summary>
     public float AttackDamage { get { return _attackDamage; } }
+
+    /// <summary>
+    /// Gets the unit that this battle unit is based off.
+    /// </summary>
+    public Unit Unit { get { return this._unit; } }
 
     #endregion
 
