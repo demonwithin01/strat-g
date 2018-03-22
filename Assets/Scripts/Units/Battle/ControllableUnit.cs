@@ -1,10 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using DEnt;
-
-public class ControllableUnit : BattleUnit
+﻿public class ControllableUnit : BattleUnit
 {
 
     /* ---------------------------------------------------------------------------------------------------------- */

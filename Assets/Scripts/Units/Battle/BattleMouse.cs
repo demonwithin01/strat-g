@@ -1,9 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.UI;
-using System;
-using DEnt;
+﻿using DEnt;
+using UnityEngine;
 
 public class BattleMouse : MonoBehaviour
 {

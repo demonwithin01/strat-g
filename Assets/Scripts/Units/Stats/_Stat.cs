@@ -1,3 +1,4 @@
+using DEnt;
 using DEnt.Language;
 using UnityEngine;
 
@@ -12,6 +13,11 @@ public abstract class Stat
     /// Holds the value of the stat.
     /// </summary>
     private float _value;
+
+    /// <summary>
+    /// Holds the modifications value of the stat.
+    /// </summary>
+    private float _modificationsValue;
 
     /// <summary>
     /// Holds the maximum range variance of the stat.
@@ -48,6 +54,9 @@ public abstract class Stat
     public Stat( float initialValue, float maxVariance, float minVariance )
     {
         this._value = initialValue;
+
+        this.Modifications = new ManagedList<StatModification>();
+        this.Modifications.CollectionChanged += ModificationsChanged;
     }
 
     #endregion
@@ -78,12 +87,16 @@ public abstract class Stat
     {
         float totalRange = ( this._maxVariance - this._minVariance );
 
-        if ( totalRange <= 0f )
+        float value = this._value;
+
+        if ( totalRange > 0f )
         {
-            return this._value;
+            value += Random.Range( -this._minVariance, this._maxVariance );
         }
 
-        return ( this._value + Random.Range( -this._minVariance, this._maxVariance ) ) ;
+        value += this._modificationsValue;
+
+        return value;
     }
 
     /// <summary>
@@ -101,6 +114,19 @@ public abstract class Stat
     /* ---------------------------------------------------------------------------------------------------------- */
 
     #region Private Methods
+
+    /// <summary>
+    /// Event to when the modifications list is changed.
+    /// </summary>
+    private void ModificationsChanged( ManagedList<StatModification> modifications )
+    {
+        this._modificationsValue = 0f;
+
+        for ( int i = 0 ; i < this.Modifications.Count ; i++ )
+        {
+            this._modificationsValue += this.Modifications[ i ].Value;
+        }
+    }
 
     #endregion
 
@@ -122,6 +148,11 @@ public abstract class Stat
     /// Gets whether or not this stat is allow to drop below zero.
     /// </summary>
     public bool CanDropBelowZero { get; protected set; }
+
+    /// <summary>
+    /// Gets the modifications against this stat.
+    /// </summary>
+    public ManagedList<StatModification> Modifications { get; private set; }
 
     #endregion
 
@@ -181,6 +212,17 @@ public abstract class Stat
         get
         {
             return ( this._value + this._minVariance );
+        }
+    }
+
+    /// <summary>
+    /// Gets the total modifications value of the stat.
+    /// </summary>
+    public float TotalModificationsValue
+    {
+        get
+        {
+            return this._modificationsValue;
         }
     }
 

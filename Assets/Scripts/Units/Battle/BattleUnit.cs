@@ -1,8 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using StrategyGame.Units;
+﻿using System.Collections.Generic;
 using DEnt;
+using StrategyGame.Units;
+using UnityEngine;
 
 public class BattleUnit : MonoBehaviour
 {

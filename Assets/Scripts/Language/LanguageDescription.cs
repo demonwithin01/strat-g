@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 /// <summary>
 /// Defines details for describing languages and loading language files.

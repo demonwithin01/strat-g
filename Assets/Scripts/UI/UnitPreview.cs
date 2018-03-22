@@ -1,7 +1,6 @@
-﻿using DEnt;
+﻿using System.Collections.Generic;
+using DEnt;
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine.UI;
 
 public class UnitPreview : MonoBehaviour
@@ -45,7 +44,7 @@ public class UnitPreview : MonoBehaviour
         this._statsPanel = (RectTransform)( transform.FindDescendant( "Stats" ) );
 
 
-        Spearman spearman = GameObject.Find( "UnitPreviewModel" ).GetComponent<Spearman>();
+        Spearman spearman = new Spearman();
 
         this.Unit = spearman;
     }

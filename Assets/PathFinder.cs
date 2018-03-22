@@ -1,10 +1,10 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using DEnt;
 using UnityEngine;
 
+/// <summary>
+/// The object responsible for determining a path across hex tiles.
+/// </summary>
 public static class PathFinder
 {
 

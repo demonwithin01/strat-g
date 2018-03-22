@@ -2,6 +2,9 @@
 using UnityEngine;
 using DEnt;
 
+/// <summary>
+/// The object responsible for maintaining the Hex information in a battle scenario.
+/// </summary>
 public class BattleHex : MonoBehaviour
 {
 

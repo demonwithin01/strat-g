@@ -3,7 +3,7 @@
 namespace DEnt
 {
     /// <summary>
-    /// Provides useful shortcuts for getting Color objects.
+    /// Provides useful shortcuts for getting Color objects from RBG based values.
     /// </summary>
     public static class Colour
     {

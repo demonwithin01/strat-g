@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using DEnt.Language;
-using UnityEngine;
 
 /// <summary>
 /// The base unit object that will define all common functionality between 
 /// the battle map and the strategy map.
 /// </summary>
-public abstract class Unit : MonoBehaviour
+public abstract class Unit
 {
 
     /* ---------------------------------------------------------------------------------------------------------- */
@@ -30,12 +28,7 @@ public abstract class Unit : MonoBehaviour
     /* ---------------------------------------------------------------------------------------------------------- */
 
     #region Events
-
-    /// <summary>
-    /// Raised whenever the unit is marked as destroyed.
-    /// </summary>
-    public event Action<Unit> Destroyed;
-
+        
     #endregion
 
     /* ---------------------------------------------------------------------------------------------------------- */
@@ -66,20 +59,7 @@ public abstract class Unit : MonoBehaviour
     /* ---------------------------------------------------------------------------------------------------------- */
 
     #region Public Methods
-
-    /// <summary>
-    /// Marks the unit as destroyed.
-    /// </summary>
-    public void Destroy()
-    {
-        base.gameObject.SetActive( false );
-
-        if ( this.Destroyed != null )
-        {
-            this.Destroyed.Invoke( this );
-        }
-    }
-
+        
     /// <summary>
     /// Gets all the stats that are considered valid.
     /// </summary>

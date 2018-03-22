@@ -1,11 +1,11 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace DEnt
 {
+    /// <summary>
+    /// Maintains a list of extensions for the UnityEngine Transform class.
+    /// </summary>
     public static class TransformExtensions
     {
 

@@ -1,4 +1,5 @@
-public class MeleeDefence : Stat
+
+public class StatModification
 {
 
     /* ---------------------------------------------------------------------------------------------------------- */
@@ -10,12 +11,6 @@ public class MeleeDefence : Stat
     /* ---------------------------------------------------------------------------------------------------------- */
 
     #region Constructors/Initialisation
-
-    public MeleeDefence( float initialValue )
-        : base( initialValue )
-    {
-        base.ApplyLanguageSettings( LanguageSettings.Current.Stats.MeleeDefence.Settings );
-    }
 
     #endregion
 
@@ -34,6 +29,16 @@ public class MeleeDefence : Stat
     /* ---------------------------------------------------------------------------------------------------------- */
 
     #region Properties
+
+    /// <summary>
+    /// Gets the value of the modification.
+    /// </summary>
+    public float Value { get; private set; }
+
+    /// <summary>
+    /// Gets the description of the modification.
+    /// </summary>
+    public string Description { get; private set; }
 
     #endregion
 

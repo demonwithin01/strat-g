@@ -1,10 +1,9 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
 
+/// <summary>
+/// An object responsible for maintaining a path across a group of Hexes.
+/// </summary>
 public class Path<Hex> : IEnumerable<Hex>
 {
 
@@ -18,6 +17,12 @@ public class Path<Hex> : IEnumerable<Hex>
 
     #region Constructors/Initialisation
 
+    /// <summary>
+    /// Creates a new path step.
+    /// </summary>
+    /// <param name="lastStep">The step for the path to this point.</param>
+    /// <param name="previousSteps">The previous steps for the path.</param>
+    /// <param name="totalCost">The total cost to get to this</param>
     private Path( Hex lastStep, Path<Hex> previousSteps, double totalCost )
     {
         LastStep = lastStep;
@@ -25,6 +30,10 @@ public class Path<Hex> : IEnumerable<Hex>
         TotalCost = totalCost;
     }
 
+    /// <summary>
+    /// Creates a new path.
+    /// </summary>
+    /// <param name="start">The initial hex for the path.</param>
     public Path( Hex start )
         : this( start, null, 0 )
     {
@@ -47,14 +56,20 @@ public class Path<Hex> : IEnumerable<Hex>
         return new Path<Hex>( step, this, TotalCost + stepCost );
     }
 
+    /// <summary>
+    /// Gets the enumerator so that the object can be traversed sequentially.
+    /// </summary>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
     }
 
+    /// <summary>
+    /// Gets the enumerator so that the object can be traversed sequentially.
+    /// </summary>
     public IEnumerator<Hex> GetEnumerator()
     {
-        for ( var p = this ; p != null ; p = p.PreviousSteps )
+        for ( Path<Hex> p = this ; p != null ; p = p.PreviousSteps )
         {
             yield return p.LastStep;
         }
@@ -67,7 +82,7 @@ public class Path<Hex> : IEnumerable<Hex>
     {
         List<Hex> path = new List<Hex>();
 
-        for ( var p = this ; p != null ; p = p.PreviousSteps )
+        for ( Path<Hex> p = this ; p != null ; p = p.PreviousSteps )
         {
             path.Add( p.LastStep );
         }
@@ -89,9 +104,20 @@ public class Path<Hex> : IEnumerable<Hex>
 
     #region Properties
 
+    /// <summary>
+    /// Gets the last step in the current path.
+    /// </summary>
     public Hex LastStep { get; private set; }
+
+    /// <summary>
+    /// Gets all the previous steps in the path.
+    /// </summary>
     public Path<Hex> PreviousSteps { get; private set; }
-    public double TotalCost { get; set; }
+
+    /// <summary>
+    /// Gets the total cost of the path up to this point.
+    /// </summary>
+    public double TotalCost { get; private set; }
 
     #endregion
 

@@ -1,9 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using DEnt.Language;
 
+/// <summary>
+/// Maintains global settings in memory allow a single access point for various settings of the game.
+/// </summary>
 public static class GlobalSettings
 {
 

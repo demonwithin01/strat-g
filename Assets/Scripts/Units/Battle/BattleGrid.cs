@@ -1,9 +1,7 @@
-﻿using UnityEngine;
-using DEnt;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using DEnt;
+using UnityEngine;
 
 public class BattleGrid : MonoBehaviour
 {
@@ -210,7 +208,7 @@ public class BattleGrid : MonoBehaviour
 
         if ( this._battleKeyboard.IsInputActionPressed( BattleInputAction.ShowUnitDetails ) )
         {
-            GameObject unitPreview = GameObject.Find( "Canvas" ).FindObject( "UnitPreview" );
+            GameObject unitPreview = GameObject.Find( "Canvas" ).FindDescendant( "UnitPreview" );
 
             unitPreview.SetActive( !unitPreview.activeSelf );
         }
