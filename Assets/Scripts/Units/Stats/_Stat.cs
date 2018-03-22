@@ -54,6 +54,8 @@ public abstract class Stat
     public Stat( float initialValue, float maxVariance, float minVariance )
     {
         this._value = initialValue;
+        this._maxVariance = maxVariance;
+        this._minVariance = minVariance;
 
         this.Modifications = new ManagedList<StatModification>();
         this.Modifications.CollectionChanged += ModificationsChanged;
