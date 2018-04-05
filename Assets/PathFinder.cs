@@ -35,13 +35,18 @@ public static class PathFinder
         var closed = new HashSet<BattleHex>();
         var queue = new PriorityQueue<double, Path<BattleHex>>();
 
+        if ( start == destination )
+        {
+            return new Path<BattleHex>( start );
+        }
+
         if ( destination.IsPassable == false || destination.HasUnit )
         {
             return null;
         }
 
         queue.Enqueue( 0, new Path<BattleHex>( start ) );
-        
+
         while ( !queue.IsEmpty )
         {
             var path = queue.Dequeue();

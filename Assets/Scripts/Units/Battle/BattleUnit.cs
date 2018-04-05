@@ -409,6 +409,22 @@ public class BattleUnit : MonoBehaviour
     }
 
     /// <summary>
+    /// Called when the User moves the mouse over the Button UI element.
+    /// </summary>
+    internal void OnUIMouseOver()
+    {
+        GetComponent<MeshRenderer>().material.color = Color.blue;
+    }
+
+    /// <summary>
+    /// Called when the User moves the mouse out from the Button UI element.
+    /// </summary>
+    internal void OnUIMouseOut()
+    {
+        GetComponent<MeshRenderer>().material.color = _isCurrentUnit ? Color.red : Color.white;
+    }
+
+    /// <summary>
     /// Raised when an action has reached its completion.
     /// </summary>
     /// <param name="action">The action that was just completed.</param>
@@ -521,6 +537,11 @@ public class BattleUnit : MonoBehaviour
     /// Gets the unit that this battle unit is based off.
     /// </summary>
     public Unit Unit { get { return this._unit; } }
+
+    /// <summary>
+    /// Gets/Sets the UI button that will be displayed in the Battle UI.
+    /// </summary>
+    public UnitTurnGUI UIButton { get; set; }
 
     #endregion
 

@@ -68,12 +68,20 @@ public class Turn
     /// </summary>
     public bool WaitEnabled { get; internal set; }
 
+    /// <summary>
+    /// Gets whether or not this turn object is the current turn.
+    /// </summary>
+    public bool IsCurrentTurn { get; internal set; }
+
     #endregion
 
     /* --------------------------------------------------------------------- */
 
     #region Derived Properties
 
+    /// <summary>
+    /// Gets the battle unit associated with this turn.
+    /// </summary>
     public BattleUnit Unit { get { return _unit; } }
 
     #endregion

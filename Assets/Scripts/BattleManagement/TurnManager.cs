@@ -1,7 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+/// <summary>
+/// The battle turn manager.
+/// TODO: Rename
+/// </summary>
 public class TurnManager : MonoBehaviour
 {
 
@@ -50,7 +55,7 @@ public class TurnManager : MonoBehaviour
     /// Holds the reference to the battle turn GUI manager.
     /// </summary>
     private BattleTurnGUI _battleTurnGui;
-
+    
     #endregion
 
     /* --------------------------------------------------------------------- */
@@ -62,23 +67,32 @@ public class TurnManager : MonoBehaviour
     /* --------------------------------------------------------------------- */
 
     #region Unity Methods
-
-    // Use this for initialization
-    void Start()
+        
+    /// <summary>
+    /// Unity Start method, used for initialization.
+    /// </summary>
+    private void Start()
     {
-        _livingUnits = FindObjectsOfType<BattleUnit>().ToList(); ;
-        _turnOrder = new Queue<Turn>();
-        _waitTurnOrder = new Queue<Turn>();
+        this._livingUnits = FindObjectsOfType<BattleUnit>().ToList();
+        this._turnOrder = new Queue<Turn>();
+        this._waitTurnOrder = new Queue<Turn>();
 
-        _battleGrid = FindObjectOfType<BattleGrid>();
+        this._battleGrid = FindObjectOfType<BattleGrid>();
 
-        _battleTurnGui = new BattleTurnGUI( _turnPanel );
+        this._battleTurnGui = new BattleTurnGUI( this._turnPanel, this );
 
         GenerateTurnOrder();
+        
+        if ( this.TurnOrderChanged != null )
+        {
+            this.TurnOrderChanged.Invoke( this._turnOrder, this._waitTurnOrder );
+        }
     }
-
-    // Update is called once per frame
-    void Update()
+    
+    /// <summary>
+    /// Unity Update method, called once per frame.
+    /// </summary>
+    private void Update()
     {
 
     }
@@ -94,10 +108,13 @@ public class TurnManager : MonoBehaviour
     /// </summary>
     public void Wait()
     {
-        _currentTurn.WaitEnabled = true;
-        _waitTurnOrder.Enqueue( _currentTurn );
+        if ( this._currentTurn.CanWait )
+        {
+            this._currentTurn.WaitEnabled = true;
+            this._waitTurnOrder.Enqueue( this._currentTurn );
 
-        FinishTurn();
+            TurnEnd();
+        }
     }
 
     /// <summary>
@@ -105,20 +122,12 @@ public class TurnManager : MonoBehaviour
     /// </summary>
     public void FinishTurn()
     {
-        if ( _turnOrder.Count == 0 )
+        if ( this._currentTurn != null )
         {
-            _turnOrder = _waitTurnOrder;
-            _waitTurnOrder = new Queue<Turn>();
+            this._currentTurn.Unit.UIButton.SetActiveState( false );
         }
 
-        if ( _turnOrder.Count == 0)
-        {
-            GenerateTurnOrder();
-        }
-
-        _currentTurn = _turnOrder.Dequeue();
-        _battleGrid.SelectUnit( _currentTurn.Unit );
-        _currentTurn.Unit.StartTurn();
+        TurnEnd();
     }
 
     /// <summary>
@@ -127,17 +136,17 @@ public class TurnManager : MonoBehaviour
     /// <param name="unit">The unit that has been destroyed.</param>
     public void UnitDestroyed( BattleUnit unit )
     {
-        _livingUnits.Remove( unit );
+        this._livingUnits.Remove( unit );
 
-        Turn deadTurn = _turnOrder.FirstOrDefault( s => s.Unit == unit );
+        Turn deadTurn = this._turnOrder.FirstOrDefault( s => s.Unit == unit );
 
         if ( deadTurn != null )
         {
             Queue<Turn> restructure = new Queue<Turn>();
             
-            while ( _turnOrder.Count > 0 )
+            while ( this._turnOrder.Count > 0 )
             {
-                Turn turn = _turnOrder.Dequeue();
+                Turn turn = this._turnOrder.Dequeue();
 
                 if ( turn != deadTurn )
                 {
@@ -145,7 +154,7 @@ public class TurnManager : MonoBehaviour
                 }
             }
 
-            _turnOrder = restructure;
+            this._turnOrder = restructure;
         }
     }
 
@@ -162,6 +171,39 @@ public class TurnManager : MonoBehaviour
     #region Private Methods
 
     /// <summary>
+    /// Handles when the current turn is completely terminated.
+    /// </summary>
+    private void TurnEnd()
+    {
+        if ( this._currentTurn != null )
+        {
+            this._currentTurn.IsCurrentTurn = false;
+        }
+
+        if ( this._turnOrder.Count == 0 )
+        {
+            this._turnOrder = this._waitTurnOrder;
+            this._waitTurnOrder = new Queue<Turn>();
+        }
+
+        if ( _turnOrder.Count == 0 )
+        {
+            GenerateTurnOrder();
+        }
+
+        if ( this.TurnOrderChanged != null )
+        {
+            this.TurnOrderChanged.Invoke( this._turnOrder, this._waitTurnOrder );
+        }
+
+        this._currentTurn = this._turnOrder.Dequeue();
+
+        this._battleGrid.SelectUnit( this._currentTurn.Unit );
+        this._currentTurn.IsCurrentTurn = true;
+        this._currentTurn.Unit.StartTurn();
+    }
+
+    /// <summary>
     /// Generates the turn order of the units.
     /// </summary>
     /// <remarks>
@@ -171,10 +213,10 @@ public class TurnManager : MonoBehaviour
     {
         List<Turn> turns = new List<Turn>();
 
-        foreach ( BattleUnit unit in _livingUnits )
+        foreach ( BattleUnit unit in this._livingUnits )
         {
             Turn turn = new Turn( unit );
-            turn.randomisedValue = Random.value;
+            turn.randomisedValue = UnityEngine.Random.value;
 
             turns.Add( turn );
         }
@@ -183,7 +225,9 @@ public class TurnManager : MonoBehaviour
 
         foreach ( Turn turn in turns )
         {
-            _turnOrder.Enqueue( turn );
+            turn.Unit.UIButton.SetActiveState( true );
+            turn.Unit.UIButton.SetTurn( turn );
+            this._turnOrder.Enqueue( turn );
         }
     }
 
@@ -191,7 +235,29 @@ public class TurnManager : MonoBehaviour
 
     /* --------------------------------------------------------------------- */
 
+    #region Events
+        
+    /// <summary>
+    /// The event for when the turn order is changed.
+    /// </summary>
+    public event Action<Queue<Turn>, Queue<Turn>> TurnOrderChanged;
+
+    #endregion
+
+    /* --------------------------------------------------------------------- */
+
     #region Properties
+
+    #endregion
+
+    /* --------------------------------------------------------------------- */
+
+    #region Derived Properties
+
+    /// <summary>
+    /// Gets the current turn order for the current set of turns.
+    /// </summary>
+    public Queue<Turn> TurnOrder { get { return this._turnOrder; } }
 
     #endregion
 

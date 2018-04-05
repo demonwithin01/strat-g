@@ -20,6 +20,11 @@ public class AIControlledUnit : BattleUnit
 
     #region Construction
 
+    public AIControlledUnit()
+    {
+        base.IsAIControlled = true;
+    }
+
     #endregion
 
     /* --------------------------------------------------------------------- */
@@ -29,7 +34,7 @@ public class AIControlledUnit : BattleUnit
     // Use this for initialization
     void Start()
     {
-        base.IsAIControlled = true;
+        
     }
 
     // Update is called once per frame
@@ -73,8 +78,15 @@ public class AIControlledUnit : BattleUnit
 
         if ( endTile == null )
         {
-            int tileIndex = ( (int)( Random.value * 1000 ) ) % hexesWithinDistance.Count;
-            endTile = hexesWithinDistance[ tileIndex ];
+            if ( hexesWithinDistance.Count == 0 )
+            {
+                endTile = CurrentHexTile;
+            }
+            else
+            {
+                int tileIndex = ( (int)( Random.value * 1000 ) ) % hexesWithinDistance.Count;
+                endTile = hexesWithinDistance[ tileIndex ];
+            }
         }
 
         Path<BattleHex> path = PathFinder.FindPath( CurrentHexTile, endTile );
