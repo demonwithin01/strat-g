@@ -10,7 +10,7 @@ public class UnitTurnGUI
 
     #region Class Members
 
-    private TurnManager _turnManager;
+    private BattleTurnManager _turnManager;
 
     private GameObject _unitTurnGui;
 
@@ -32,7 +32,7 @@ public class UnitTurnGUI
 
     #region Constructors/Initialisation
 
-    public UnitTurnGUI( TurnManager turnManager, BattleTurnGUI battleTurnGui, BattleUnit unit, int index )
+    public UnitTurnGUI( BattleTurnManager turnManager, BattleTurnGUI battleTurnGui, BattleUnit unit, int index )
     {
         this._turnManager = turnManager;
         this._unit = unit;
@@ -100,9 +100,11 @@ public class UnitTurnGUI
     /// Sets the position of the element.
     /// </summary>
     /// <param name="position">The new position of the UI element.</param>
-    public void SetPosition( Vector3 position )
+    /// <param name="isInteractable">Sets whether or not the button can be interacted with at this time.</param>
+    public void SetPosition( Vector3 position, bool isInteractable )
     {
         this._guiTransform.position = position;
+        this._button.interactable = isInteractable;
     }
 
     /// <summary>

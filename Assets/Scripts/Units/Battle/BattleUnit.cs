@@ -152,22 +152,22 @@ public class BattleUnit : MonoBehaviour
     /// <param name="grid">A list of all the tiles in the map</param>
     public void FindNodesWithinDistance( List<BattleHex> grid )
     {
-        hexesWithinDistance = new List<BattleHex>();
+        hexesWithinDistance = _battleGrid.FindNodesWithinDistance( this._currentHex, this._maxTileDistance );
 
-        foreach ( BattleHex hex in grid )
-        {
-            if ( _currentHex == hex || !hex.IsPassable || hex.HasUnit )
-            {
-                continue;
-            }
+        //foreach ( BattleHex hex in grid )
+        //{
+        //    if ( _currentHex == hex || !hex.IsPassable || hex.HasUnit )
+        //    {
+        //        continue;
+        //    }
 
-            Path<BattleHex> path = PathFinder.FindPath( _currentHex, hex );
+        //    Path<BattleHex> path = PathFinder.FindPath( _currentHex, hex );
 
-            if ( path != null && path.GetPath().Count <= _maxTileDistance )
-            {
-                hexesWithinDistance.Add( hex );
-            }
-        }
+        //    if ( path != null && path.GetPath().Count <= _maxTileDistance )
+        //    {
+        //        hexesWithinDistance.Add( hex );
+        //    }
+        //}
     }
 
     /// <summary>
@@ -350,7 +350,7 @@ public class BattleUnit : MonoBehaviour
 
         _currentHex.Unit = null;
 
-        FindObjectOfType<TurnManager>().UnitDestroyed( this );
+        FindObjectOfType<BattleTurnManager>().UnitDestroyed( this );
 
         Destroy( gameObject );
     }
@@ -496,12 +496,23 @@ public class BattleUnit : MonoBehaviour
 
         _battleGrid.PathFinished();
     }
-    
+
     #endregion
 
     /* --------------------------------------------------------------------- */
 
     #region Properties
+
+    /// <summary>
+    /// Gets/Sets the UI button that will be displayed in the Battle UI.
+    /// </summary>
+    public UnitTurnGUI UIButton { get; set; }
+
+    #endregion
+
+    /* --------------------------------------------------------------------- */
+
+    #region Derived Properties
 
     /// <summary>
     /// Gets the current hex tile that this unit is standing on.
@@ -529,6 +540,11 @@ public class BattleUnit : MonoBehaviour
     public bool CanMove { get { return hexesWithinDistance.Count > 0; } }
 
     /// <summary>
+    /// The current tiles that are within walking distance of this unit.
+    /// </summary>
+    public List<BattleHex> HexesWithinReach { get { return this.hexesWithinDistance; } }
+
+    /// <summary>
     /// Gets the attack damage of this unit.
     /// </summary>
     public float AttackDamage { get { return _attackDamage; } }
@@ -539,9 +555,9 @@ public class BattleUnit : MonoBehaviour
     public Unit Unit { get { return this._unit; } }
 
     /// <summary>
-    /// Gets/Sets the UI button that will be displayed in the Battle UI.
+    /// Gets the max distance that the unit can travel.
     /// </summary>
-    public UnitTurnGUI UIButton { get; set; }
+    public int MaxTravelDistance { get { return this._maxTileDistance; } }
 
     #endregion
 

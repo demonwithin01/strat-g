@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
 
 /// <summary>
 /// The battle turn manager.
-/// TODO: Rename
 /// </summary>
-public class TurnManager : MonoBehaviour
+public class BattleTurnManager : MonoBehaviour
 {
 
     /* --------------------------------------------------------------------- */
@@ -42,6 +42,11 @@ public class TurnManager : MonoBehaviour
     private Queue<Turn> _waitTurnOrder;
 
     /// <summary>
+    /// Maintains a list of all turns to be taken.
+    /// </summary>
+    private List<Turn> _allRemainingTurns;
+
+    /// <summary>
     /// Holds the current turn.
     /// </summary>
     private Turn _currentTurn;
@@ -55,6 +60,11 @@ public class TurnManager : MonoBehaviour
     /// Holds the reference to the battle turn GUI manager.
     /// </summary>
     private BattleTurnGUI _battleTurnGui;
+
+    /// <summary>
+    /// Holds the reference to the AI player.
+    /// </summary>
+    private BattleAI _aiPlayer;
     
     #endregion
 
@@ -80,6 +90,7 @@ public class TurnManager : MonoBehaviour
         this._battleGrid = FindObjectOfType<BattleGrid>();
 
         this._battleTurnGui = new BattleTurnGUI( this._turnPanel, this );
+        this._aiPlayer = new BattleAI( this );
 
         GenerateTurnOrder();
         
@@ -87,6 +98,8 @@ public class TurnManager : MonoBehaviour
         {
             this.TurnOrderChanged.Invoke( this._turnOrder, this._waitTurnOrder );
         }
+
+        RegenerateAllRemainingTurnsList();
     }
     
     /// <summary>
@@ -198,9 +211,16 @@ public class TurnManager : MonoBehaviour
 
         this._currentTurn = this._turnOrder.Dequeue();
 
+        RegenerateAllRemainingTurnsList();
+
         this._battleGrid.SelectUnit( this._currentTurn.Unit );
         this._currentTurn.IsCurrentTurn = true;
         this._currentTurn.Unit.StartTurn();
+
+        if ( this._currentTurn.Unit.IsAIControlled )
+        {
+            this._aiPlayer.ActivateTurn( this._currentTurn );
+        }
     }
 
     /// <summary>
@@ -231,6 +251,24 @@ public class TurnManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Regenerates the 'all turns' list object.
+    /// </summary>
+    private void RegenerateAllRemainingTurnsList()
+    {
+        this._allRemainingTurns = new List<Turn>();
+
+        foreach ( Turn turn in this._turnOrder )
+        {
+            this._allRemainingTurns.Add( turn );
+        }
+
+        foreach ( Turn turn in this._waitTurnOrder )
+        {
+            this._allRemainingTurns.Add( turn );
+        }
+    }
+
     #endregion
 
     /* --------------------------------------------------------------------- */
@@ -258,6 +296,16 @@ public class TurnManager : MonoBehaviour
     /// Gets the current turn order for the current set of turns.
     /// </summary>
     public Queue<Turn> TurnOrder { get { return this._turnOrder; } }
+
+    /// <summary>
+    /// Gets the current wait turn order for the current set of turns.
+    /// </summary>
+    public ReadOnlyCollection<Turn> RemainingTurns { get { return this._allRemainingTurns.AsReadOnly(); } }
+
+    /// <summary>
+    /// Gets the AI player.
+    /// </summary>
+    public BattleAI AI { get { return this._aiPlayer; } }
 
     #endregion
 

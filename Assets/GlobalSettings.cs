@@ -1,3 +1,4 @@
+using System;
 using DEnt.Language;
 
 /// <summary>
@@ -9,7 +10,12 @@ public static class GlobalSettings
     /* ---------------------------------------------------------------------------------------------------------- */
 
     #region Class Members
-        
+
+    /// <summary>
+    /// Holds the current difficulty for the game.
+    /// </summary>
+    private static Difficulty _gameDifficulty;
+
     #endregion
 
     /* ---------------------------------------------------------------------------------------------------------- */
@@ -62,6 +68,46 @@ public static class GlobalSettings
     /// Gets the current language.
     /// </summary>
     public static LanguageDetails CurrentLanguage { get; private set; }
+
+    #endregion
+
+    /* ---------------------------------------------------------------------------------------------------------- */
+
+    #region Derived Properties
+
+    /// <summary>
+    /// Gets/Sets the difficulty level for the game.
+    /// </summary>
+    public static Difficulty GameDifficulty
+    {
+        get
+        {
+            return _gameDifficulty;
+        }
+        set
+        {
+            if ( value != _gameDifficulty )
+            {
+                _gameDifficulty = value;
+
+                if ( DifficultyChanged != null )
+                {
+                    DifficultyChanged.Invoke( _gameDifficulty );
+                }
+            }
+        }
+    }
+
+    #endregion
+
+    /* ---------------------------------------------------------------------------------------------------------- */
+
+    #region Events
+
+    /// <summary>
+    /// The event which is raised when the difficulty is changed.
+    /// </summary>
+    public static event Action<Difficulty> DifficultyChanged;
 
     #endregion
 

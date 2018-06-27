@@ -15,7 +15,7 @@ public class BattleTurnGUI
     /// <summary>
     /// Holds a reference to the turn manager.
     /// </summary>
-    private TurnManager _turnManager;
+    private BattleTurnManager _turnManager;
 
     /// <summary>
     /// Gets the panel responsible for rendering the turn UI elements.
@@ -48,7 +48,7 @@ public class BattleTurnGUI
     /// </summary>
     /// <param name="turnPanel">The UI panel for rendering the UI elements to.</param>
     /// <param name="turnManager">The turn manager.</param>
-    public BattleTurnGUI( GameObject turnPanel, TurnManager turnManager )
+    public BattleTurnGUI( GameObject turnPanel, BattleTurnManager turnManager )
     {
         this.turnPanel = turnPanel;
 
@@ -94,14 +94,17 @@ public class BattleTurnGUI
     private void UpdateUIPositions( Queue<Turn> turnOrder, Queue<Turn> waitTurnOrder )
     {
         int index = 0;
+        bool isInteractible = true;
         foreach ( Turn turn in turnOrder )
         {
-            turn.Unit.UIButton.SetPosition( new Vector3( width / 2f + gutter + ( ( width + gutter ) * index++ ), height / 2f + gutter ) );
+            turn.Unit.UIButton.SetPosition( new Vector3( width / 2f + gutter + ( ( width + gutter ) * index++ ), height / 2f + gutter ), isInteractible );
+            isInteractible = false;
         }
 
         foreach ( Turn turn in waitTurnOrder )
         {
-            turn.Unit.UIButton.SetPosition( new Vector3( width / 2f + gutter + ( ( width + gutter ) * index++ ), height / 2f + gutter ) );
+            turn.Unit.UIButton.SetPosition( new Vector3( width / 2f + gutter + ( ( width + gutter ) * index++ ), height / 2f + gutter ), isInteractible );
+            isInteractible = false;
         }
     }
 

@@ -37,6 +37,8 @@ public class BattleHex : MonoBehaviour
     /// </summary>
     private Dictionary<HexDirection, Vector3> _neighbourPositions;
 
+    private List<Vector3> _lines;
+
     #endregion
 
     /* ---------------------------------------------------------------------------------------------------------- */
@@ -51,7 +53,7 @@ public class BattleHex : MonoBehaviour
     /// <param name="gridSize">The size of the grid</param>
     /// <param name="length">The length of the tile</param>
     /// <param name="parent">The parent to attach this tile to</param>
-    public void Configure( int x, int y, Point2D gridSize, float length, GameObject parent )
+    public void Configure( int x, int y, Point2D gridSize, float length, GameObject parent, Material lineMaterial )
     {
         X = x;
         Y = y;
@@ -102,6 +104,27 @@ public class BattleHex : MonoBehaviour
         _neighbourPositions.Add( HexDirection.West, worldPosition + 2 * westOffset );
         _neighbourPositions.Add( HexDirection.NorthWest, worldPosition + 2 * northWestOffset );
 
+        _lines = new List<Vector3>();
+        _lines.Add( worldPosition + Quaternion.Euler( 0f, 0f, 0f ) * Vector3.forward * length * 0.577f );
+        _lines.Add( worldPosition + Quaternion.Euler( 0f, 300f, 0f ) * Vector3.forward * length * 0.577f );
+        _lines.Add( worldPosition + Quaternion.Euler( 0f, 240f, 0f ) * Vector3.forward * length * 0.577f );
+        _lines.Add( worldPosition + Quaternion.Euler( 0f, 180f, 0f ) * Vector3.forward * length * 0.577f );
+        _lines.Add( worldPosition + Quaternion.Euler( 0f, 120f, 0f ) * Vector3.forward * length * 0.577f );
+        _lines.Add( worldPosition + Quaternion.Euler( 0f, 60f, 0f ) * Vector3.forward * length * 0.577f );
+
+        LineRenderer lineRenderer = gameObject.AddComponent<LineRenderer>();
+
+        lineRenderer.positionCount = _lines.Count;
+        lineRenderer.SetPositions( _lines.ToArray() );
+
+        lineRenderer.material = lineMaterial;
+        lineRenderer.loop = true;
+        lineRenderer.allowOcclusionWhenDynamic = false;
+        lineRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        lineRenderer.receiveShadows = false;
+        lineRenderer.startWidth = 0.02f;
+        lineRenderer.endWidth = 0.02f;
+
         IsPassable = true;
     }
 
@@ -124,7 +147,14 @@ public class BattleHex : MonoBehaviour
     /// </summary>
     void Update ()
     {
-        
+        //for ( int i = 1 ; i < _lines.Count ; i++ )
+        //{
+        //    if ( name == "hex_0_0" )
+        //    Debug.Log( _lines[ i - 1 ] );
+        //    Debug.DrawLine( _lines[ i - 1 ], _lines[ i ] );
+        //}
+
+        //Debug.DrawLine( _lines[ 0 ], _lines[ _lines.Count - 1 ] );
     }
 
     #endregion
