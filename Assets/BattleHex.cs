@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using DEnt;
+using System;
 
 /// <summary>
 /// The object responsible for maintaining the Hex information in a battle scenario.
 /// </summary>
-public class BattleHex : MonoBehaviour
+public class BattleHex : Hex
 {
 
     /* ---------------------------------------------------------------------------------------------------------- */
@@ -44,6 +45,33 @@ public class BattleHex : MonoBehaviour
     /* ---------------------------------------------------------------------------------------------------------- */
 
     #region Construction
+
+    public BattleHex()
+    {
+        this.IsPassable = true;
+    }
+
+    internal void ConfigureEdges()
+    {
+        Vector3 worldPosition = transform.position;
+        float halfLength = 1 / 2f;
+
+        Vector3 eastOffset = Quaternion.Euler( 0f, 0f, 0f ) * Vector3.right * halfLength;
+        Vector3 northEastOffset = Quaternion.Euler( 0f, 300f, 0f ) * Vector3.right * halfLength;
+        Vector3 southEastOffset = Quaternion.Euler( 0f, 60f, 0f ) * Vector3.right * halfLength;
+        Vector3 westOffset = Quaternion.Euler( 0f, 180f, 0f ) * Vector3.right * halfLength;
+        Vector3 northWestOffset = Quaternion.Euler( 0f, 240f, 0f ) * Vector3.right * halfLength;
+        Vector3 southWestOffset = Quaternion.Euler( 0f, 120f, 0f ) * Vector3.right * halfLength;
+
+        _edgeCenters = new Dictionary<HexDirection, Vector3>();
+
+        _edgeCenters.Add( HexDirection.NorthEast, worldPosition + northEastOffset );
+        _edgeCenters.Add( HexDirection.East, worldPosition + eastOffset );
+        _edgeCenters.Add( HexDirection.SouthEast, worldPosition + southEastOffset );
+        _edgeCenters.Add( HexDirection.SouthWest, worldPosition + southWestOffset );
+        _edgeCenters.Add( HexDirection.West, worldPosition + westOffset );
+        _edgeCenters.Add( HexDirection.NorthWest, worldPosition + northWestOffset );
+    }
 
     /// <summary>
     /// Configures this hex tile position, colour, parent, etc.
@@ -139,7 +167,7 @@ public class BattleHex : MonoBehaviour
     /// </summary>
     void Start ()
     {
-    
+        this.IsPassable = true;
     }
 
     /// <summary>
@@ -147,6 +175,7 @@ public class BattleHex : MonoBehaviour
     /// </summary>
     void Update ()
     {
+        this.IsPassable = true;
         //for ( int i = 1 ; i < _lines.Count ; i++ )
         //{
         //    if ( name == "hex_0_0" )
@@ -166,13 +195,13 @@ public class BattleHex : MonoBehaviour
     public void MouseEnter() // TEMP
     {
         _color.a = 1f;
-        _renderer.material.color = _color;
+        //_renderer.material.color = _color;
     }
 
     public void MouseLeave() // TEMP
     {
         _color.a = 0.2f;
-        _renderer.material.color = _color;
+        //_renderer.material.color = _color;
     }
 
     public void SetColour( Color color ) // TEMP
@@ -181,7 +210,13 @@ public class BattleHex : MonoBehaviour
         _color.g = color.g;
         _color.b = color.b;
 
-        _renderer.material.color = _color;
+        LineRenderer line = this.GetComponent<LineRenderer>();
+
+        line.material.color = color;
+        line.startColor = color;
+        line.endColor = color;
+        
+        //_renderer.material.color = _color;
     }
 
     public void ResetColour() // TEMP
@@ -189,48 +224,230 @@ public class BattleHex : MonoBehaviour
         _color.r = 1f;
         _color.g = 1f;
         _color.b = 1f;
-
-        _renderer.material.color = _color;
+        
+        //_renderer.material.color = _color;
     }
 
     /// <summary>
     /// Finds all the tiles that are considered to be neighbours of the current tile.
     /// </summary>
     /// <param name="hexes">A dictionary of all the hex tiles</param>
-    public void FindNeighbours( Dictionary<Point2D, BattleHex> hexes )
+    public void FindNeighbours( BattleHex[][] hexes )
     {
         List<Point2D> neighbourShift = new List<Point2D>();
+        List<HexDirection> shiftDirections = new List<HexDirection>();
+
         neighbourShift.Add( new Point2D( 0, -1 ) );
+        shiftDirections.Add( HexDirection.West );
+
         neighbourShift.Add( new Point2D( 1, -1 ) );
+        shiftDirections.Add( HexDirection.NorthWest );
+
         neighbourShift.Add( new Point2D( 0, 1 ) );
+        shiftDirections.Add( HexDirection.East );
+
         neighbourShift.Add( new Point2D( 1, 1 ) );
+        shiftDirections.Add( HexDirection.NorthEast );
 
         if ( Y % 2 == 0 )
         {
             neighbourShift.Add( new Point2D( -1, 0 ) );
+            shiftDirections.Add( HexDirection.SouthEast );
+
             neighbourShift.Add( new Point2D( 1, 0 ) );
+            shiftDirections.Add( HexDirection.SouthWest );
         }
         else
         {
             neighbourShift.Add( new Point2D( 1, 0 ) );
+            shiftDirections.Add( HexDirection.SouthEast );
+
             neighbourShift.Add( new Point2D( -1, 0 ) );
+            shiftDirections.Add( HexDirection.SouthWest );
         }
 
         Neighbours = new List<BattleHex>();
-        
+
+        this._edgeCenters = new Dictionary<HexDirection, Vector3>();
+        this._neighbourPositions = new Dictionary<HexDirection, Vector3>();
+
+        if ( this.WorldPosition.z == 0f && this.WorldPosition.x == -6.928203f )
+        {
+
+        }
+
         foreach ( Point2D shift in neighbourShift )
         {
             int x = X + shift.X;
             int y = Y + shift.Y;
             int xOffset = ( Y % 2 == 0 && y % 2 == 1 ? 1 : 0 );
-            x -= xOffset;
-
+            //x -= xOffset;
+            
             Point2D point = new Point2D( x, y );
-            if ( hexes.ContainsKey( point ) )
+            if ( x >= 0 && x < hexes.Length && hexes[ x ] != null && y >= 0 && y < hexes[ x ].Length && hexes[ x ][ y ] != null )
             {
-                Neighbours.Add( hexes[ point ] );
+                BattleHex neighbour = hexes[ x ][ y ];
+
+                Neighbours.Add( neighbour );
+                HexDirection direction = shiftDirections[ neighbourShift.IndexOf( shift ) ];
+                _neighbourPositions.Add( direction, neighbour.WorldPosition );
+                Vector3[] sharedCorners = new Vector3[ 2 ];
+                int index = 0;
+
+                for ( int i = 0 ; i < neighbour.Corners.Count && index < 2 ; i++ )
+                {
+                    for ( int j = 0 ; j < this.Corners.Count && index < 2 ; j++ )
+                    {
+                        if ( this.Corners[ j ] == neighbour.Corners[ i ] )
+                        {
+                            sharedCorners[ index ] = neighbour.Corners[ i ];
+
+                            ++index;
+                        }
+                    }
+                }
+
+                this._edgeCenters.Add( direction, Vector3.Lerp( sharedCorners[ 0 ], sharedCorners[ 1 ], 0.5f ) );
             }
         }
+    }
+
+    public HexDirection DirectionOfNeighbour( BattleHex hex )
+    {
+        Vector3 currentPosition = this.WorldPosition;
+        Vector3 neighbourPosition = hex.WorldPosition;
+
+        if ( currentPosition.z == neighbourPosition.z )
+        {
+            if ( currentPosition.x < neighbourPosition.x )
+            {
+                return HexDirection.East;
+            }
+            else
+            {
+                return HexDirection.West;
+            }
+        }
+        else if ( currentPosition.z < neighbourPosition.z ) //
+        {
+            if ( currentPosition.x < neighbourPosition.x )
+            {
+                return HexDirection.SouthEast;
+            }
+            else if ( currentPosition.x > neighbourPosition.x )
+            {
+                return HexDirection.SouthWest;
+            }
+            else
+            {
+                return HexDirection.East;
+            }
+        }
+        else // North
+        {
+            if ( currentPosition.x < neighbourPosition.x )
+            {
+                return HexDirection.NorthEast;
+            }
+            else if ( currentPosition.x > neighbourPosition.x )
+            {
+                return HexDirection.NorthWest;
+            }
+            else
+            {
+                return HexDirection.West;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Finds all the tiles that are considered to be neighbours of the current tile.
+    /// </summary>
+    /// <param name="hexes">A dictionary of all the hex tiles</param>
+    public void FindNeighbours( List<BattleHex> hexes )
+    {
+        this.Neighbours = new List<BattleHex>();
+
+        this._edgeCenters = new Dictionary<HexDirection, Vector3>();
+        this._neighbourPositions = new Dictionary<HexDirection, Vector3>();
+
+        float root3 = MathHelpers.RoundTo( Constants.Root3, 4 );
+
+        if ( hexes.IndexOf( this ) == 35 )
+        {
+
+        }
+        
+        foreach ( BattleHex hex in hexes )
+        {
+            float distance = MathHelpers.RoundTo( Vector3.Distance( this.WorldPosition, hex.WorldPosition ), 4 );
+            
+            if ( this != hex && distance == root3 )
+            {
+                HexDirection direction = DirectionOfNeighbour( hex );
+
+                this.Neighbours.Add( hex );
+                if ( _neighbourPositions.ContainsKey( direction ) )
+                {
+                    Debug.Log( "Continue" );
+                    continue;
+                }
+
+                _neighbourPositions.Add( direction, hex.WorldPosition );
+                Vector3[] sharedCorners = new Vector3[ 2 ];
+                int index = 0;
+
+                for ( int i = 0 ; i < hex.Corners.Count && index < 2 ; i++ )
+                {
+                    for ( int j = 0 ; j < this.Corners.Count && index < 2 ; j++ )
+                    {
+                        if ( this.Corners[ j ] == hex.Corners[ i ] )
+                        {
+                            sharedCorners[ index ] = hex.Corners[ i ];
+
+                            ++index;
+                        }
+                    }
+                }
+
+                this._edgeCenters.Add( direction, Vector3.Lerp( sharedCorners[ 0 ], sharedCorners[ 1 ], 0.5f ) );
+            }
+        }
+
+    //    foreach ( Point2D shift in neighbourShift )
+    //    {
+    //        int x = X + shift.X;
+    //        int y = Y + shift.Y;
+    //        int xOffset = ( Y % 2 == 0 && y % 2 == 1 ? 1 : 0 );
+    //        //x -= xOffset;
+
+    //        Point2D point = new Point2D( x, y );
+    //        if ( x >= 0 && x < hexes.Length && hexes[ x ] != null && y >= 0 && y < hexes[ x ].Length && hexes[ x ][ y ] != null )
+    //        {
+    //            BattleHex neighbour = hexes[ x ][ y ];
+
+    //            Neighbours.Add( neighbour );
+    //            HexDirection direction = shiftDirections[ neighbourShift.IndexOf( shift ) ];
+    //            _neighbourPositions.Add( direction, neighbour.WorldPosition );
+    //            Vector3[] sharedCorners = new Vector3[ 2 ];
+    //            int index = 0;
+
+    //            for ( int i = 0 ; i < neighbour.Corners.Count && index < 2 ; i++ )
+    //            {
+    //                for ( int j = 0 ; j < this.Corners.Count && index < 2 ; j++ )
+    //                {
+    //                    if ( this.Corners[ j ] == neighbour.Corners[ i ] )
+    //                    {
+    //                        sharedCorners[ index ] = neighbour.Corners[ i ];
+
+    //                        ++index;
+    //                    }
+    //                }
+    //            }
+
+    //            this._edgeCenters.Add( direction, Vector3.Lerp( sharedCorners[ 0 ], sharedCorners[ 1 ], 0.5f ) );
+    //        }
+    //    }
     }
 
     /// <summary>
@@ -250,7 +467,14 @@ public class BattleHex : MonoBehaviour
     /// <returns>The real world co-ordinates of the center of the neighbouring tile.</returns>
     public Vector3 GetNeighbourPosition( HexDirection direction )
     {
-        return _neighbourPositions[ direction ];
+        try
+        {
+            return _neighbourPositions[ direction ];
+        }
+        catch( Exception ex )
+        {
+            return Vector3.zero;
+        }
     }
 
     #endregion
@@ -292,18 +516,7 @@ public class BattleHex : MonoBehaviour
     /* ---------------------------------------------------------------------------------------------------------- */
 
     #region Properties
-
-    /// <summary>
-    /// Gets the world position of this hex tile.
-    /// </summary>
-    public Vector3 WorldPosition
-    {
-        get
-        {
-            return transform.position;
-        }
-    }
-
+        
     /// <summary>
     /// Gets the length of the tile.
     /// </summary>
@@ -318,17 +531,7 @@ public class BattleHex : MonoBehaviour
     /// Gets whether or not there is currently a unit standing on this tile.
     /// </summary>
     public bool HasUnit { get { return ( Unit != null ); } }
-
-    /// <summary>
-    /// The X location in the hex grid.
-    /// </summary>
-    public int X { get; private set; }
-
-    /// <summary>
-    /// The Y location in the hex grid.
-    /// </summary>
-    public int Y { get; private set; }
-
+    
     /// <summary>
     /// Gets whether or not this tile has a neighbour with a unit on it.
     /// </summary>

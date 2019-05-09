@@ -1,4 +1,6 @@
-﻿public class HexHelpers
+﻿using UnityEngine;
+
+public class HexHelpers
 {
 
     /* ---------------------------------------------------------------------------------------------------------- */
@@ -47,40 +49,84 @@
     /// </summary>
     public static HexDirection GetTargetDirection( BattleHex tile1, BattleHex tile2 )
     {
-        HexDirection direction;
+        Vector3 currentPosition = tile1.WorldPosition;
+        Vector3 neighbourPosition = tile2.WorldPosition;
 
-        if ( tile1.Y == tile2.Y )
+        if ( currentPosition.z == neighbourPosition.z )
         {
-            if ( tile1.X > tile2.X )
+            if ( currentPosition.x < neighbourPosition.x )
             {
-                direction = HexDirection.East;
+                return HexDirection.West;
             }
             else
             {
-                direction = HexDirection.West;
+                return HexDirection.East;
             }
         }
-        else if ( tile1.Y > tile2.Y )
+        else if ( currentPosition.z < neighbourPosition.z ) //
         {
-            if ( tile1.X > tile2.X || tile1.X == tile2.X + ( 1 - tile1.Y % 2 ) )
+            if ( currentPosition.x < neighbourPosition.x )
             {
-                direction = HexDirection.SouthEast;
+                return HexDirection.NorthWest;
+            }
+            else if ( currentPosition.x > neighbourPosition.x )
+            {
+                return HexDirection.NorthEast;
             }
             else
             {
-                direction = HexDirection.SouthWest;
+                return HexDirection.East;
             }
         }
-        else if ( tile1.X > tile2.X || tile1.X == tile2.X + ( 1 - tile1.Y % 2 ) )
+        else // North
         {
-            direction = HexDirection.NorthEast;
+            if ( currentPosition.x < neighbourPosition.x )
+            {
+                return HexDirection.SouthWest;
+            }
+            else if ( currentPosition.x > neighbourPosition.x )
+            {
+                return HexDirection.SouthEast;
+            }
+            else
+            {
+                return HexDirection.West;
+            }
         }
-        else
-        {
-            direction = HexDirection.NorthWest;
-        }
+        //HexDirection direction;
 
-        return direction;
+        //if ( tile1.Y == tile2.Y )
+        //{
+        //    if ( tile1.X > tile2.X )
+        //    {
+        //        direction = HexDirection.East;
+        //    }
+        //    else
+        //    {
+        //        direction = HexDirection.West;
+        //    }
+        //}
+        //else if ( tile1.Y > tile2.Y )
+        //{
+        //    if ( tile1.X > tile2.X || tile1.X == tile2.X + ( 1 - tile1.Y % 2 ) )
+        //    {
+        //        direction = HexDirection.SouthEast;
+        //    }
+        //    else
+        //    {
+        //        direction = HexDirection.SouthWest;
+        //    }
+        //}
+        //else if ( tile1.X > tile2.X || tile1.X == tile2.X + ( 1 - tile1.Y % 2 ) )
+        //{
+        //    direction = HexDirection.NorthEast;
+        //}
+        //else
+        //{
+        //    direction = HexDirection.NorthWest;
+        //}
+
+        //return direction;
     }
 
     /// <summary>
@@ -101,17 +147,17 @@
         switch ( direction )
         {
             case HexDirection.NorthEast:
-                return 210f;
+                return 330f;
             case HexDirection.East:
                 return 270f;
             case HexDirection.SouthEast:
-                return 330f;
+                return 210f;
             case HexDirection.SouthWest:
-                return 30f;
+                return 150f;
             case HexDirection.West:
                 return 90f;
             case HexDirection.NorthWest:
-                return 150f;
+                return 30f;
         }
 
         return 0f;
@@ -122,13 +168,13 @@
     /// </summary>
     public static HexDirection GetRotationDirection( float degrees )
     {
-        if ( degrees == 210f ) return HexDirection.NorthEast;
+        if ( degrees == 210f ) return HexDirection.SouthEast;
         if ( degrees == 270f ) return HexDirection.East;
-        if ( degrees == 330f ) return HexDirection.SouthEast;
-        if ( degrees == 30f ) return HexDirection.SouthWest;
+        if ( degrees == 330f ) return HexDirection.NorthEast;
+        if ( degrees == 30f ) return HexDirection.NorthWest;
         if ( degrees == 90f ) return HexDirection.West;
 
-        return HexDirection.NorthWest;
+        return HexDirection.SouthWest;
     }
 
     /// <summary>

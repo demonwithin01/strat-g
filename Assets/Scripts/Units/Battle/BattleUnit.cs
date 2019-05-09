@@ -225,7 +225,7 @@ public class BattleUnit : MonoBehaviour
         {
             BattleHex current = path[ i ];
             BattleHex next = path[ i + 1 ];
-
+            
             HexDirection requiredDirection = HexHelpers.GetTargetDirection( current, next );
 
             float requiredRotation = HexHelpers.GetTargetDegrees( requiredDirection );

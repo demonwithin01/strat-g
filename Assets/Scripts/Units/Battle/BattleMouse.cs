@@ -1,4 +1,5 @@
-﻿using DEnt;
+﻿using System.Collections.Generic;
+using DEnt;
 using UnityEngine;
 
 public class BattleMouse : MonoBehaviour
@@ -81,14 +82,35 @@ public class BattleMouse : MonoBehaviour
         {
             for ( int i = 0 ; i < allHits.Length && hit == null ; i++ )
             {
-                PixelMe( allHits[ i ].point );
-                BattleHex newHit = allHits[ i ].transform.gameObject.GetComponentInParent<BattleHex>();
+                Vector3 testPoint = allHits[ 0 ].point;
 
-                if ( newHit != null )
+                BattleHex hexHit = FindHexForPoint( testPoint );
+
+                //if ( hexHit != null && hexHit != _currentHit )
+                //{
+                //    //decolour = false;
+
+                //    DeColourHex();
+
+                //    SetLineColour( hexHit, Color.red, false );
+                //    _currentHit = hexHit;
+                //}
+
+                //PixelMe( allHits[ i ].point );
+                //BattleHex newHit = allHits[ i ].transform.gameObject.GetComponentInParent<BattleHex>();
+
+                if ( hexHit != null )
                 {
                     hit = allHits[ i ];
 
-                    if ( newHit.HasUnit && newHit.Unit is AIControlledUnit )
+                    if ( hexHit != _currentHit )
+                    {
+                        DeColourHex();
+
+                        SetLineColour( hexHit, Color.red, false );
+                    }
+
+                    if ( hexHit.HasUnit && hexHit.Unit is AIControlledUnit )
                     {
                         foundUnit = true;
 
@@ -101,7 +123,7 @@ public class BattleMouse : MonoBehaviour
 
                         BattleHex closestHex = null;
                         float closestDistance = float.MaxValue;
-                        foreach ( var hex in newHit.Neighbours )
+                        foreach ( var hex in hexHit.Neighbours )
                         {
                             float distance = Vector3.Distance( hex.transform.position, hit.Value.point );
 
@@ -114,7 +136,7 @@ public class BattleMouse : MonoBehaviour
 
                         if ( closestHex != null )
                         {
-                            toAttack = newHit.Unit;
+                            toAttack = hexHit.Unit;
 
                             if ( _currentHit != closestHex )
                             {
@@ -137,20 +159,24 @@ public class BattleMouse : MonoBehaviour
                             _currentHit = null;
                         }
                     }
-                    else if ( _currentHit != newHit )
+                    else if ( _currentHit != hexHit )
                     {
                         if ( _currentHit == null )
                         {
-                            _currentHit = newHit;
+                            _currentHit = hexHit;
                             _currentHit.MouseEnter();
                         }
                         else
                         {
                             _currentHit.MouseLeave();
-                            _currentHit = newHit;
+                            _currentHit = hexHit;
                             _currentHit.MouseEnter();
                         }
                     }
+                }
+                else
+                {
+                    DeColourHex();
                 }
             }
         }
@@ -263,6 +289,87 @@ public class BattleMouse : MonoBehaviour
         Debug.Log( rx + ", " + rz );
 
         Debug.Log( position.x + ", " + position.z + " => " + x + ", " + z );
+    }
+
+    private BattleHex FindHexForPoint( Vector3 point )
+    {
+        HexOrientationSettings orientationSettings = this._battleGrid.OrientationSettings;
+
+        float minLength = 1.5f;
+        float maxLength = minLength / 2f * Constants.Root3;
+
+        List<BattleHex> testFurther = new List<BattleHex>();
+
+        for ( int x = 0 ; x < this._battleGrid.hexes.Length ; x++ )
+        {
+            for ( int y = 0 ; y < this._battleGrid.hexes[ x ].Length ; y++ )
+            {
+                BattleHex testHex = this._battleGrid.hexes[ x ][ y ];
+
+                if ( testHex == null )
+                {
+                    continue;
+                }
+
+                float distance = Vector3.Distance( testHex.WorldPosition, point );
+
+                if ( distance <= maxLength )
+                {
+                    testFurther.Add( testHex );
+                }
+            }
+        }
+
+        foreach ( BattleHex hex in testFurther )
+        {
+            if ( hex.IsPointWithinHex( point ) )
+            {
+                return hex;
+            }
+        }
+
+        return null;
+    }
+
+    private void DeColourHex()
+    {
+        SetLineColour( _currentHit, Color.white, true );
+
+        _currentHit = null;
+    }
+
+    private void SetLineColour( Hex hex, Color color, bool returningToDefault )
+    {
+        if ( hex != null )
+        {
+            LineRenderer line = hex.GetComponent<LineRenderer>();
+
+            line.material.color = color;
+
+            for ( int i = 0 ; i < line.positionCount ; i++ )
+            {
+                Vector3 position = line.GetPosition( i );
+
+                position.y = returningToDefault ? 0f : 0.01f;
+
+                line.SetPosition( i, position );
+            }
+
+            if ( returningToDefault )
+            {
+                line.widthMultiplier = 1f;
+
+                line.sortingLayerID = SortingLayer.NameToID( "Default" );
+            }
+            else
+            {
+                line.widthMultiplier = 4f;
+
+                line.sortingLayerID = SortingLayer.NameToID( "Overlay" );
+            }
+            
+            
+        }
     }
 
     #endregion

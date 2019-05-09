@@ -3,18 +3,13 @@ using System.Linq;
 using DEnt;
 using UnityEngine;
 
-public class BattleGrid : MonoBehaviour
+public class BattleGrid : Map<BattleHex>
 {
 
     /* --------------------------------------------------------------------- */
 
     #region Editable Fields
-
-#pragma warning disable 0649
-    [SerializeField]
-    private GameObject _hexTemplate;
-#pragma warning restore 0649
-
+        
     /// <summary>
     /// The camera movement speed.
     /// </summary>
@@ -50,10 +45,7 @@ public class BattleGrid : MonoBehaviour
     /// </summary>
     [SerializeField]
     private Vector2 _maxCameraLimit = new Vector2( 15f, 15f );
-
-    [SerializeField]
-    private Material _lineMaterial;
-
+    
     #endregion
 
     /* --------------------------------------------------------------------- */
@@ -69,11 +61,6 @@ public class BattleGrid : MonoBehaviour
 
     private List<AIControlledUnit> _player2Units;
     
-    /// <summary>
-    /// Maintains the list of hex tiles.
-    /// </summary>
-    private List<BattleHex> _grid;
-
     /// <summary>
     /// The current unit that has been selected.
     /// </summary>
@@ -112,9 +99,7 @@ public class BattleGrid : MonoBehaviour
     private void Start()
     {
         this._distanceFromPivot = Vector3.Distance( Vector3.up * Camera.main.transform.position.y, Camera.main.transform.position );
-
-        this._grid = new List<BattleHex>();
-
+        
         this._battleMouse = GetComponent<BattleMouse>();
         this._battleKeyboard = GetComponent<BattleKeyboard>();
 
@@ -124,34 +109,18 @@ public class BattleGrid : MonoBehaviour
         Point2D gridSize = new Point2D( 12, 9 );
         Dictionary<Point2D, BattleHex> hexGrid = new Dictionary<Point2D, BattleHex>();
 
+        base.CreateMap();
+
+        
+
         this._turnManager = FindObjectOfType<BattleTurnManager>();
 
         this._units = FindObjectsOfType<ControllableUnit>().ToList();
         this._player2Units = FindObjectsOfType<AIControlledUnit>().ToList();
-
-        for ( int y = 0 ; y < gridSize.Y ; y++ )
+        
+        foreach ( var hexItem in base.HexTiles )
         {
-            int sizeX = gridSize.X;
-
-            if ( y % 2 != 0 && ( gridSize.X + 0.5f ) * fullLength > 10f )
-            {
-                --sizeX;
-            }
-
-            for ( int x = 0 ; x < sizeX ; x++ )
-            {
-                GameObject hex = (GameObject)Instantiate( this._hexTemplate );
-                BattleHex hexComponent = hex.GetComponent<BattleHex>();
-                hexComponent.Configure( x, y, gridSize, fullLength, transform.gameObject, _lineMaterial );
-
-                hexGrid.Add( new Point2D( x, y ), hexComponent );
-                this._grid.Add( hexComponent );
-            }
-        }
-
-        foreach ( var hexItem in hexGrid )
-        {
-            hexItem.Value.FindNeighbours( hexGrid );
+            hexItem.FindNeighbours( base.HexTiles );
         }
 
         int index = 0;
@@ -159,14 +128,14 @@ public class BattleGrid : MonoBehaviour
         {
             ControllableUnit unit = _units[ i ];
 
-            unit.InitialiseWithTile( this, _grid[ index ], 90f );
+            unit.InitialiseWithTile( this, this.HexTiles[ index ], 90f );
             
             index += gridSize.X - i % 2;
         }
 
         for ( int i = 0 ; i < this._player2Units.Count ; i++ )
         {
-            this._player2Units[ i ].InitialiseWithTile( this, this._grid[ this._grid.Count - i - 1 ], 270f );
+            this._player2Units[ i ].InitialiseWithTile( this, this.HexTiles[ this.HexTiles.Count - i - 1 ], 270f );
         }
 
         this._turnManager.FinishTurn();
@@ -260,7 +229,7 @@ public class BattleGrid : MonoBehaviour
     {
         List<BattleHex> hexesWithinDistance = new List<BattleHex>();
 
-        foreach ( BattleHex hex in this._grid )
+        foreach ( BattleHex hex in this.HexTiles )
         {
             if ( currentHex == hex || !hex.IsPassable || hex.HasUnit )
             {
@@ -274,13 +243,13 @@ public class BattleGrid : MonoBehaviour
                 hexesWithinDistance.Add( hex );
             }
         }
-
+        
         return hexesWithinDistance;
     }
 
     public void UnhighlightNodes()
     {
-        foreach ( var hex in this._grid )
+        foreach ( var hex in this.HexTiles )
         {
             if ( hex.DoesNeighbourHaveUnit )
             {
@@ -311,7 +280,7 @@ public class BattleGrid : MonoBehaviour
         _currentUnit.SelectUnit();
 
         UnhighlightNodes();
-        _currentUnit.FindNodesWithinDistance( this._grid );
+        _currentUnit.FindNodesWithinDistance( this.HexTiles );
         _currentUnit.HighlightNodes();
     }
 
@@ -360,11 +329,6 @@ public class BattleGrid : MonoBehaviour
     /// </summary>
     public BattleUnit CurrentUnit { get { return this._currentUnit; } }
     
-    /// <summary>
-    /// Gets all the hex tiles in the grid.
-    /// </summary>
-    public List<BattleHex> HexTiles { get { return this._grid; } }
-
     #endregion
 
     /* --------------------------------------------------------------------- */
