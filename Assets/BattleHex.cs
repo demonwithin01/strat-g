@@ -194,14 +194,28 @@ public class BattleHex : Hex
 
     public void MouseEnter() // TEMP
     {
-        _color.a = 1f;
+        //_color.a = 1f;
         //_renderer.material.color = _color;
     }
 
     public void MouseLeave() // TEMP
     {
-        _color.a = 0.2f;
+        //_color.a = 0.2f;
         //_renderer.material.color = _color;
+
+        LineRenderer line = this.GetComponent<LineRenderer>();
+
+        for ( int i = 0 ; i < line.positionCount ; i++ )
+        {
+            Vector3 position = line.GetPosition( i );
+
+            position.y = 0f;
+
+            line.SetPosition( i, position );
+        }
+
+        line.widthMultiplier = 1f;
+        line.sortingLayerID = SortingLayer.NameToID( "Default" );
     }
 
     public void SetColour( Color color ) // TEMP

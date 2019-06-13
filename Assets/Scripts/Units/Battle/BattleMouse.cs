@@ -74,7 +74,6 @@ public class BattleMouse : MonoBehaviour
         BattleUnit toAttack = null;
 
         Ray ray = Camera.main.ScreenPointToRay( Input.mousePosition );
-        //PixelMe( Camera.main.ScreenToWorldPoint( Input.mousePosition ) );
 
         RaycastHit[] allHits = Physics.RaycastAll( ray, 200f );
 
@@ -85,31 +84,11 @@ public class BattleMouse : MonoBehaviour
                 Vector3 testPoint = allHits[ 0 ].point;
 
                 BattleHex hexHit = FindHexForPoint( testPoint );
-
-                //if ( hexHit != null && hexHit != _currentHit )
-                //{
-                //    //decolour = false;
-
-                //    DeColourHex();
-
-                //    SetLineColour( hexHit, Color.red, false );
-                //    _currentHit = hexHit;
-                //}
-
-                //PixelMe( allHits[ i ].point );
-                //BattleHex newHit = allHits[ i ].transform.gameObject.GetComponentInParent<BattleHex>();
-
+                
                 if ( hexHit != null )
                 {
                     hit = allHits[ i ];
-
-                    if ( hexHit != _currentHit )
-                    {
-                        DeColourHex();
-
-                        SetLineColour( hexHit, Color.red, false );
-                    }
-
+                    
                     if ( hexHit.HasUnit && hexHit.Unit is AIControlledUnit )
                     {
                         foundUnit = true;
@@ -140,18 +119,18 @@ public class BattleMouse : MonoBehaviour
 
                             if ( _currentHit != closestHex )
                             {
-                                if ( _currentHit == null )
-                                {
-                                    _currentHit = closestHex;
-                                    _currentHit.MouseEnter();
-                                }
-                                else
+                                DeColourHex();
+
+                                if ( _currentHit != null )
                                 {
                                     _currentHit.MouseLeave();
-                                    _currentHit = closestHex;
-                                    _currentHit.MouseEnter();
                                 }
+
+                                _currentHit = closestHex;
+                                _currentHit.MouseEnter();
                             }
+
+                            SetLineColour( _currentHit, Color.white, false );
                         }
                         else if ( _currentHit != null )
                         {
@@ -161,17 +140,21 @@ public class BattleMouse : MonoBehaviour
                     }
                     else if ( _currentHit != hexHit )
                     {
-                        if ( _currentHit == null )
-                        {
-                            _currentHit = hexHit;
-                            _currentHit.MouseEnter();
-                        }
-                        else
+                        DeColourHex();
+
+                        if ( _currentHit != null )
                         {
                             _currentHit.MouseLeave();
-                            _currentHit = hexHit;
-                            _currentHit.MouseEnter();
                         }
+
+                        _currentHit = hexHit;
+                        _currentHit.MouseEnter();
+
+                        SetLineColour( hexHit, Color.red, false );
+                    }
+                    else if ( _currentHit != null )
+                    {
+
                     }
                 }
                 else
@@ -255,42 +238,7 @@ public class BattleMouse : MonoBehaviour
     /* --------------------------------------------------------------------- */
 
     #region Private Methods
-
-    private void PixelMe( Vector3 position )
-    {
-        Vector3 hex0 = new Vector3( -11, 0, 8 );
-        Debug.Log( Vector3.Distance( position, hex0 ) );
-
-        float x = ( Mathf.Sqrt( 3 ) / 3 * position.x - 1f / 3 * position.z );
-        float z = ( 2f / 3 * position.z );
-        float y = -x - z;
-
-        int rx = Mathf.RoundToInt( x );
-        int rz = Mathf.RoundToInt( z );
-        int ry = Mathf.RoundToInt( y ); ;
-
-        float xDiff = Mathf.Abs( rx - x );
-        float zDiff = Mathf.Abs( rz - z );
-        float yDiff = Mathf.Abs( ry - y );
-
-        if ( xDiff > zDiff && xDiff > yDiff )
-        {
-            rx = -rz-ry;
-        }
-        else if ( yDiff > zDiff )
-        {
-            ry = -rx-rz;
-        }
-        else
-        {
-            rz = -rx-ry;
-        }
-
-        Debug.Log( rx + ", " + rz );
-
-        Debug.Log( position.x + ", " + position.z + " => " + x + ", " + z );
-    }
-
+        
     private BattleHex FindHexForPoint( Vector3 point )
     {
         HexOrientationSettings orientationSettings = this._battleGrid.OrientationSettings;
@@ -334,7 +282,7 @@ public class BattleMouse : MonoBehaviour
     private void DeColourHex()
     {
         SetLineColour( _currentHit, Color.white, true );
-
+        
         _currentHit = null;
     }
 
@@ -367,8 +315,6 @@ public class BattleMouse : MonoBehaviour
 
                 line.sortingLayerID = SortingLayer.NameToID( "Overlay" );
             }
-            
-            
         }
     }
 
