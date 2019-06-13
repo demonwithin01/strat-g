@@ -57,7 +57,14 @@ public class BattleMouse : MonoBehaviour
     /// <summary>
     /// Unity Start event handler.
     /// </summary>
-    void Start ()
+    private void Start()
+    {
+        _battleGrid = transform.GetComponent<BattleGrid>();
+
+        Cursor.SetCursor( _regularCursor, Vector2.zero, CursorMode.Auto );
+    }
+
+    private void Awake()
     {
         _battleGrid = transform.GetComponent<BattleGrid>();
 
@@ -67,7 +74,7 @@ public class BattleMouse : MonoBehaviour
     /// <summary>
     /// Unity Update loop.
     /// </summary>
-    void Update ()
+    private void Update ()
     {
         RaycastHit? hit = null;
         bool foundUnit = false;
@@ -88,7 +95,7 @@ public class BattleMouse : MonoBehaviour
                 if ( hexHit != null )
                 {
                     hit = allHits[ i ];
-                    
+
                     if ( hexHit.HasUnit && hexHit.Unit is AIControlledUnit )
                     {
                         foundUnit = true;
@@ -106,7 +113,7 @@ public class BattleMouse : MonoBehaviour
                         {
                             float distance = Vector3.Distance( hex.transform.position, hit.Value.point );
 
-                            if ( distance < closestDistance )
+                            if ( distance < closestDistance && ( hex.HasUnit == false || hex.Unit == _battleGrid.CurrentUnit ) )
                             {
                                 closestDistance = distance;
                                 closestHex = hex;
@@ -147,14 +154,13 @@ public class BattleMouse : MonoBehaviour
                             _currentHit.MouseLeave();
                         }
 
-                        _currentHit = hexHit;
-                        _currentHit.MouseEnter();
+                        if ( hexHit.HasUnit == false || hexHit.Unit == _battleGrid.CurrentUnit )
+                        {
+                            _currentHit = hexHit;
+                            _currentHit.MouseEnter();
 
-                        SetLineColour( hexHit, Color.red, false );
-                    }
-                    else if ( _currentHit != null )
-                    {
-
+                            SetLineColour( hexHit, Color.red, false );
+                        }
                     }
                 }
                 else

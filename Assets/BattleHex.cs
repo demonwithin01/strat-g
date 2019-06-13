@@ -229,7 +229,7 @@ public class BattleHex : Hex
         line.material.color = color;
         line.startColor = color;
         line.endColor = color;
-        
+
         //_renderer.material.color = _color;
     }
 
@@ -238,7 +238,13 @@ public class BattleHex : Hex
         _color.r = 1f;
         _color.g = 1f;
         _color.b = 1f;
-        
+
+        LineRenderer line = this.GetComponent<LineRenderer>();
+
+        line.material.color = Color.white;
+        line.startColor = Color.white;
+        line.endColor = Color.white;
+
         //_renderer.material.color = _color;
     }
 

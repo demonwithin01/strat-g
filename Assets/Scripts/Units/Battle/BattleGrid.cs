@@ -227,6 +227,7 @@ public class BattleGrid : Map<BattleHex>
     /// <param name="distance">The distance to travel.</param>
     public List<BattleHex> FindNodesWithinDistance( BattleHex currentHex, int distance )
     {
+        distance = distance + 1;
         List<BattleHex> hexesWithinDistance = new List<BattleHex>();
 
         foreach ( BattleHex hex in this.HexTiles )
